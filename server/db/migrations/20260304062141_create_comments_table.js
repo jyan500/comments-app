@@ -9,7 +9,8 @@ exports.up = function(knex) {
 		table.string("author").notNullable()
 		table.string("image").notNullable()
 		table.integer("likes").notNullable()
- 		table.timestamp('date').notNullable().defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
+		table.timestamp('created_at').defaultTo(knex.fn.now());	
+ 		table.timestamp("updated_at").notNullable().defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
 	})	 
 };
 

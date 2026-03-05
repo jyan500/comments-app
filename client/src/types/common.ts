@@ -2,9 +2,10 @@ export interface Comment {
 	id: number
 	author: string
 	text: string
-	date: Date
 	likes: number
 	image?: string
+	createdAt: Date
+	updatedAt: Date
 }
 
 export interface IPagination {

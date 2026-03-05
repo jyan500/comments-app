@@ -8,8 +8,12 @@ exports.seed = async function(knex) {
   await knex('comments').del()
   return await knex('comments').insert(comments.comments.map((comment) => {
     return {
-      ...comment,
-      date: new Date(comment.date)
+      author: comment.author,
+      text: comment.text,
+      image: comment.image,
+      likes: comment.likes,
+      created_at: new Date(comment.date),
+      updated_at: new Date(comment.date),
     }
   }));
 };

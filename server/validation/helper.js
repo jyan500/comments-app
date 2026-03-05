@@ -15,3 +15,7 @@ const validateKeyExists = async (key, keyValue, tableName) => {
 		})
 	})	
 }
+
+module.exports = {
+	validateKeyExists
+}
