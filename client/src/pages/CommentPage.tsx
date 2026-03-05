@@ -16,7 +16,7 @@ export const CommentPage = () => {
 	return (
 		<Container>
 			<h1 className = "font-bold text-xl">Comments</h1>	
-			<Container className = "w-1/2" theme = "bordered">
+			<Container className = "w-full lg:w-1/2" theme = "bordered">
 				<CommentForm/>
 			</Container>
 			{
