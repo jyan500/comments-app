@@ -1,46 +1,101 @@
-Congratulations!
-You are here because we think you could be a good fit to join our team at Bobyard. As a fullstack engineer, you will be working on frontend & backend development while working closely with the current team. 
+## How To Run
 
-About this challenge 
-This is an exercise that represents some of the work you may encounter at Bobyard. There is no single right answer — we've left it intentionally open-ended to understand how you think.
+1)  Clone the repo locally:
 
-Please don’t spend more than ~2 hours on this. If time runs out before everything is done, no worries this task is meant to take longer! Just write up a quick explanation of where you would have taken things from where you left off if there had been more time. 
-Getting started 
-We are going to build comment functionality (similar to that of YouTube or Reddit). Download this JSON file to get started, it has a list of comments that you will use as data. 
+`$ git clone git@github.com:jyan500/comments-app.git`
 
-JSON file: https://drive.google.com/file/d/1a2nJ1ErJRGyt_oQr-heP4xT97SZRPs1N/view?usp=sharing 
+2) Ensure that you have `node` and `npm` installed locally,
+as well either MySQL or PostgreSQL for the backend.
+(My local has node `v22.17.1`, npm `v6.14.8`, and MySQL `5.7`)
 
-Part 1: Backend
-Using any database, language, and framework, set up a simple RESTful backend API. Please use what you are comfortable with, we expect you to be able to demo all its functionality & build new features upon it during a follow up. (Bobyard uses Django Rest framework with PostgreSQL, so slight preference for that stack.)
+3) Complete the steps for server side first, then the client side after.
 
-Implement edit, add, and delete functionality to comments. Update the database accordingly when these APIs are called.
 
-Requirements:
-Edit text of existing comments 
-Add a comment, with new text (from “Admin” user), with the current time
-Delete existing comments 
-List all comments
+### Server Side
 
-Part 2: Frontend setup 
-Please create a simple React.js page displaying these comments. We are judging the code quality/readability and design of the page. 
+1) Enter folder where the server code is located: 
 
-Requirements:
-Get the data from the backend
-Need to display the text, author, date, likes, and images for the comments 
-Clean design
+`$ cd server`
 
-Part 3: Frontend edit, add, and delete 
-Now add edit, add, and delete functionality to comments (pretend that the user is the admin and can change any of the comments). Use the APIs you just made in the backend. 
+2) Install Dependencies 
 
-Requirements:
-Edit text of existing comments 
-Add a comment with new text (from “Admin” user), with the current time
-Delete comments 
+`$ npm install`
 
-Submission 
-Upload to Ashby or put your solution on GitHub and link in notes for me to clone. Slight preference for a notebook, so there are no worries about the environment (please include readme for setup if otherwise).
+3) Install knex locally, this is the database driver allowing interaction between node.js and your DB.
 
-Deadline
-3-5 days
+```
+$ npm install knex --save
+```
+
+Then add one of the following (adding a --save) flag:
+```
+$ npm install pg
+$ npm install mysql2
+```
+
+Test if it was installed properly:
+```
+$ knex
+```
+should show a list of options on the terminal instead of "knex not found"
+
+4) In the root of the server folder, create a `.env` file with the following:
+
+```
+DB_CLIENT = mysql2
+DB_HOST = localhost
+DB_USER = <your DB user>
+DB_PASSWORD = <your DB password>
+DB_NAME = comments_app 
+PORT = 8000 
+```
+
+Note that **you should replace** `mysql2` with `pg` if you are using **PostgreSQL** locally rather than **MySQL**.
+
+Localhost should be replaced with the name of your db host (if it's not localhost)
+
+5) Open your local DB management app (i.e MySQL workbench) or via the command line 
+and create a new schema:
+
+```
+CREATE SCHEMA `comments_app`;
+USE `comments_app`
+```
+
+6) Run the migrations and seeds to setup the DB after creating the new schema:
+
+```
+$ knex migrate:latest
+$ knex seed:run
+```
+
+7) To run the server:
+```
+$ nodemon index.js
+```
+
+
+### Client Side
+1) Enter folder where the frontend code is located: 
+
+`$ cd client`
+
+2) Install Dependencies: 
+
+`$ npm install`
+
+3) In the root of the client folder, create a `.env` file with the following:
+
+```
+VITE_BACKEND_API_URL = "http://localhost:8000"
+```
+
+4) Run development environment: 
+
+`$ npm run dev`
+
+### Requirements:
+
+[Instructions](https://docs.google.com/document/d/1PFD93C7j4qed6-Wm0Nyhzl50oPbquk5M7io4e3Gk4o8/edit?tab=t.0#heading=h.j6z79psm1ev8)
 
 
