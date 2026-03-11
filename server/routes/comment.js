@@ -18,6 +18,12 @@ router.get("/", async (req, res, next) => {
 			if (req.query.sortBy === "id"){
 				queryBuilder.orderBy("id", req.query.order)
 			}
+			if (req.query.sortBy === "likes"){
+				queryBuilder.orderBy("comments.likes", req.query.order)
+			}
+			if (req.query.sortBy === "updated_at"){
+				queryBuilder.orderBy("updated_at", req.query.order)
+			}
 			if (req.query.sortBy === "created_at"){
 				queryBuilder.orderBy("created_at", req.query.order)
 			}
@@ -31,7 +37,7 @@ router.get("/", async (req, res, next) => {
 			"created_at as createdAt",
 			"updated_at as updatedAt",
 		)
-		// .orderBy("created_at", "desc")
+
 		.paginate({perPage: req.query.perPage ?? PER_PAGE, currentPage: req.query.page ? parseInt(req.query.page) : 1, isLengthAware: true})
 		res.json(comments)
 	}

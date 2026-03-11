@@ -3,6 +3,7 @@ import { Container } from "../components/page-elements/Container"
 import { CommentForm } from "../components/comments/CommentForm"
 import { CommentContainer } from "../components/comments/CommentContainer"
 import { Button } from "../components/page-elements/Button"
+import { ChevronDown, ChevronUp } from "lucide-react"
 import { 
 	useGetCommentsQuery,
 	useAddCommentMutation,
@@ -13,8 +14,13 @@ from "../services/public/comment"
 import { ChevronDown } from 'lucide-react'
 import { ChevronUp } from "lucide-react"
 
+interface FormValues {
+	sortBy: string
+	order: string
+}
+
 export const CommentPage = () => {
-	const [form, setForm] = useState({
+	const [form, setForm] = useState<FormValues>({
 		sortBy: localStorage.getItem("sortBy") ?? "id", 
 		order: localStorage.getItem("order") ?? "asc",
 	})

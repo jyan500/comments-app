@@ -1,4 +1,4 @@
-const PER_PAGE = 15
+const PER_PAGE = 30
 
 module.exports = {
 	PER_PAGE
