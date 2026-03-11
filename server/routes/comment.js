@@ -14,6 +14,14 @@ const { PER_PAGE } = require("../helpers/constants")
 router.get("/", async (req, res, next) => {
 	try {
 		const comments = await db("comments")
+		.modify((queryBuilder) => {
+			if (req.query.sortBy === "id"){
+				queryBuilder.orderBy("id", req.query.order)
+			}
+			if (req.query.sortBy === "created_at"){
+				queryBuilder.orderBy("created_at", req.query.order)
+			}
+		})
 		.select(
 			"id",
 			"author",
@@ -23,8 +31,8 @@ router.get("/", async (req, res, next) => {
 			"created_at as createdAt",
 			"updated_at as updatedAt",
 		)
-		.orderBy("created_at", "desc")
-		.paginate({page: req.query.perPage ?? PER_PAGE, currentPage: req.query.page ? parseInt(req.query.page) : 1, isLengthAware: true})
+		// .orderBy("created_at", "desc")
+		.paginate({perPage: req.query.perPage ?? PER_PAGE, currentPage: req.query.page ? parseInt(req.query.page) : 1, isLengthAware: true})
 		res.json(comments)
 	}
 	catch (err) {
