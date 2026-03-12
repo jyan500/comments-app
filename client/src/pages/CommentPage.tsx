@@ -11,8 +11,6 @@ import {
 	useDeleteCommentMutation,
 } 
 from "../services/public/comment"
-import { ChevronDown } from 'lucide-react'
-import { ChevronUp } from "lucide-react"
 
 interface FormValues {
 	sortBy: string
