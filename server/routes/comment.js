@@ -15,11 +15,17 @@ router.get("/", async (req, res, next) => {
 	try {
 		const comments = await db("comments")
 		.modify((queryBuilder) => {
+			if (req.query.searchBy === "keyword"){
+				queryBuilder.whereILike("text", `%${req.query.query}%`)	
+			}
+			if (req.query.searchBy === "author"){
+				queryBuilder.whereILike("author", `%${req.query.query}%`)	
+			}
 			if (req.query.sortBy === "id"){
 				queryBuilder.orderBy("id", req.query.order)
 			}
 			if (req.query.sortBy === "likes"){
-				queryBuilder.orderBy("comments.likes", req.query.order)
+				queryBuilder.orderBy("likes", req.query.order)
 			}
 			if (req.query.sortBy === "updated_at"){
 				queryBuilder.orderBy("updated_at", req.query.order)
