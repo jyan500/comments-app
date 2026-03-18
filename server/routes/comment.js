@@ -15,11 +15,17 @@ router.get("/", async (req, res, next) => {
 	try {
 		const comments = await db("comments")
 		.modify((queryBuilder) => {
+			if (req.query.searchBy === "keyword"){
+				queryBuilder.whereILike("text", `%${req.query.query}%`)	
+			}
+			if (req.query.searchBy === "author"){
+				queryBuilder.whereILike("author", `%${req.query.query}%`)	
+			}
 			if (req.query.sortBy === "id"){
 				queryBuilder.orderBy("id", req.query.order)
 			}
 			if (req.query.sortBy === "likes"){
-				queryBuilder.orderBy("comments.likes", req.query.order)
+				queryBuilder.orderBy("likes", req.query.order)
 			}
 			if (req.query.sortBy === "updated_at"){
 				queryBuilder.orderBy("updated_at", req.query.order)
@@ -32,13 +38,14 @@ router.get("/", async (req, res, next) => {
 			"id",
 			"author",
 			"text",
+			"parent",
 			"likes",
 			"image",
 			"created_at as createdAt",
 			"updated_at as updatedAt",
 		)
-
 		.paginate({perPage: req.query.perPage ?? PER_PAGE, currentPage: req.query.page ? parseInt(req.query.page) : 1, isLengthAware: true})
+
 		res.json(comments)
 	}
 	catch (err) {

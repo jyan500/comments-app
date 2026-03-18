@@ -58,6 +58,7 @@ export const commentApi = publicApi.injectEndpoints({
 
 export const { 
 	useGetCommentsQuery,
+	useLazyGetCommentsQuery,
 	useAddCommentMutation,
 	useUpdateCommentMutation,
 	useDeleteCommentMutation,
