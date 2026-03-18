@@ -1,6 +1,7 @@
 export interface Comment {
-	id: number
+	id: string 
 	author: string
+	parent: string
 	text: string
 	likes: number
 	image?: string

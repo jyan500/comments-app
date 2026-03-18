@@ -38,13 +38,14 @@ router.get("/", async (req, res, next) => {
 			"id",
 			"author",
 			"text",
+			"parent",
 			"likes",
 			"image",
 			"created_at as createdAt",
 			"updated_at as updatedAt",
 		)
-
 		.paginate({perPage: req.query.perPage ?? PER_PAGE, currentPage: req.query.page ? parseInt(req.query.page) : 1, isLengthAware: true})
+
 		res.json(comments)
 	}
 	catch (err) {

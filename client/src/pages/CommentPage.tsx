@@ -9,6 +9,7 @@ import {
 } 
 from "../services/public/comment"
 import { useSearchParams } from "react-router-dom"
+import type { Comment } from "../types/common"
 
 interface FormValues {
 	searchBy: string
@@ -21,13 +22,15 @@ interface FormValues {
 
 export const CommentPage = () => {
 	const [ searchParams, setSearchParams ] = useSearchParams()
+	const [idMap, setIdMap] = useState<Record<string, Comment>>({})
+	const [hierarchy, setHierarchy] = useState<Record<string, any>>({})
 	const [form, setForm] = useState<FormValues>({
 		searchBy: searchParams.get("searchBy") ? searchParams.get("searchBy") : "keyword",
 		query: searchParams.get("query") ? searchParams.get("query") : "",
 		sortBy: searchParams.get("sortBy")  ? searchParams.get("sortBy") : "id",
 		order: searchParams.get("order") ? searchParams.get("order") : "asc",
 		page: searchParams.get("page") && !isNaN(Number(searchParams.get("page"))) ? Number(searchParams.get("page")) : 1,
-		perPage: 5,
+		perPage: 100,
 	})
 	const [trigger, {data, isLoading}] = useLazyGetCommentsQuery()
 
@@ -35,6 +38,24 @@ export const CommentPage = () => {
 		// make initial response on page load
 		onSubmit(1)	
 	}, [])
+	
+	useEffect(() => {
+		if (data?.data && !isLoading){
+			setIdMap(getIdMap(data.data))
+			const parentToChild = mapParentToChild(data.data)
+			let threadComments = {}
+			Object.keys(parentToChild).forEach((parentId) => {
+				// start running recursion from each top level comment that has child comments
+				if (parentToChild[parentId].length){
+					threadComments[parentId] = buildIndex(parentToChild, parentId)
+				}
+				else {
+					threadComments[parentId] = {}
+				}
+			})
+			setHierarchy(threadComments)
+		}
+	}, [data, isLoading])		
 
 	const onSubmit = (curPage) => {
 		const { searchBy, query, sortBy, order } = form
@@ -42,6 +63,83 @@ export const CommentPage = () => {
 		setSearchParams({
 			searchBy, query, sortBy, order, page: curPage  
 		})
+	}
+
+	const getTopLevelComments = (comments: Array<Comment>) => {
+		return comments && comments.length ? 
+			comments.filter((comment) => comment.parent === "") 
+		: []
+	}
+
+	const buildIndex = (parentToChild: Record<string, Array<string>>, id: string) => {
+		let index = {}
+		if (id in parentToChild){
+			parentToChild[id].forEach((commentId) => {
+				index[commentId] = buildIndex(parentToChild, commentId)
+			})
+		}
+		return index
+	}
+
+	const getIdMap = (comments: Array<Comment>) => {
+		const idMap = comments.reduce((acc, obj) => {
+			acc[obj.id] = obj
+			return acc
+		}, {})
+		return idMap
+	}
+
+	/* 
+		To prevent the need to search through the whole array each time to find the children 
+		for each parent, we do a single O(N) scan. And then during recursion, instead of trying to find
+		the children for the given id by scanning through the array again, 
+		we just look up the id in this map, and know all the children for this particular parent.
+	*/
+	const mapParentToChild = (comments: Array<Comment>) => {
+		let parentToChild = {}	
+		comments.forEach((comment) => {
+			if (comment.parent === ""){
+				parentToChild[comment.id] = []
+			}
+			else {
+				if (comment.parent in parentToChild){
+					parentToChild[comment.parent].push(comment.id)
+				}
+				else {
+					parentToChild[comment.parent] = [comment.id]
+				}
+			}
+		})
+		return parentToChild
+	}
+
+	const showHierarchy = (tree: Record<string, any>, level: number) => {
+		return (
+			<div className = "flex flex-col gap-y-4">
+				{Object.keys(tree).map((key) => {
+					const comment = idMap[key]
+					if (Object.values(tree[key]).length === 0){
+						return (
+							<div key={comment.id}>
+								<CommentContainer comment={comment}/>
+							</div>
+						)
+					}
+					else {
+						return (
+							<div key={comment.id} className = "border-l border-gray-200 flex flex-col gap-y-2">
+								<CommentContainer key = {comment.id} comment={comment}/>
+								<div style={{
+									"paddingLeft": `40px`
+								}}>
+									{showHierarchy(tree[key], level+1)}
+								</div>
+							</div>
+						)
+					}
+				})}
+			</div>
+		)
 	}
 
 	return (
@@ -122,11 +220,7 @@ export const CommentPage = () => {
 				<CommentForm/>
 			</Container>
 			{
-				data?.data.map((comment) => {
-					return (
-						<CommentContainer key={comment.id} comment={comment}/>
-					)
-				})
+				showHierarchy(hierarchy, 1)
 			}
 		</Container>
 	)
